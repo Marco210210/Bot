@@ -2,7 +2,10 @@ import signal
 import sys
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler
 from config import TOKEN
-from handlers import start, button, get_player_cards, help_command, reset_command
+from handlers import (
+    start, button, home_command, help_command,
+    reset_command, suggerimento_command, conteggio_command
+)
 
 def handle_exit(signum, frame):
     print("\n🛑 Il bot è stato arrestato manualmente. Arrivederci!")
@@ -11,15 +14,16 @@ def handle_exit(signum, frame):
 def main():
     signal.signal(signal.SIGINT, handle_exit)
     app = Application.builder().token(TOKEN).build()
-    # Comandi esistenti
+
+    # Comandi
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("player_cards", get_player_cards))
-    
-    # Nuovi comandi
+    app.add_handler(CommandHandler("home", home_command))
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(CommandHandler("reset", reset_command))
-    
-    # Callback dei bottoni
+    app.add_handler(CommandHandler("suggerimento", suggerimento_command))
+    app.add_handler(CommandHandler("conteggio", conteggio_command))
+
+    # CallbackQueryHandler
     app.add_handler(CallbackQueryHandler(button))
 
     print("🚀 Bot avviato!")

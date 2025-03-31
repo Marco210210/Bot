@@ -2,8 +2,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 from game_logic import suggest_move, hand_value
 from keyboards import get_player_cards_keyboard, get_new_card_keyboard, send_dealer_card_selection, get_player_count_keyboard, get_deck_count_keyboard
-from card_count import reset_counting_state, set_counting_parameters
-from card_count_handlers import start_card_counting
+from card_count import reset_counting_state
 from card_count_handlers import (
     start_card_counting,
     handle_player_count_selection,
@@ -247,20 +246,44 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await start(update, context)
         return
 
-# Comando /help
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    help_text = (
-        "🆘 <b>Aiuto e istruzioni</b>\n\n"
-        "🎲 <b>/start</b> - Avvia il bot e scegli una modalità\n"
-        "🃏 <b>/player_cards</b> - Inserisci manualmente le tue carte\n"
-        "🔄 <b>/reset</b> - Resetta la partita corrente\n\n"
-        "<i>Segui le istruzioni sullo schermo per giocare e usare i suggerimenti!</i>"
-    )
-    await update.message.reply_html(help_text)
+# Comando /home
+async def home_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data.clear()
+    keyboard = [
+        [InlineKeyboardButton("Conteggio Carte", callback_data='count_cards')],
+        [InlineKeyboardButton("Suggerimenti di Gioco", callback_data='game_advice')],
+        [InlineKeyboardButton("Entrambe", callback_data='both')]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await update.message.reply_text("🏠 Sei tornato al menu principale. Cosa vuoi fare ora?", reply_markup=reply_markup)
+
+# Comando /suggerimento
+async def suggerimento_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data.clear()
+    await update.message.reply_text("🃏 Modalità Suggerimenti di Gioco attivata! Inserisci le tue carte:")
+    await update.message.reply_text("Qual è la tua prima carta?", reply_markup=get_player_cards_keyboard())
+
+# Comando /conteggio
+async def conteggio_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    reset_counting_state(context)
+    await update.message.reply_text("🧮 Modalità Conteggio Carte attivata!")
+    await update.message.reply_text("Quanti giocatori ci sono al tavolo?", reply_markup=get_player_count_keyboard())
 
 # Comando /reset
 async def reset_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data.clear()
-    context.user_data["player_hand"] = []
-    context.user_data["dealer_card"] = None
-    await update.message.reply_text("🔄 Partita resettata! Puoi iniziare una nuova partita con /start.")
+    await update.message.reply_text("🔄 Partita resettata! Usa /start per ricominciare.")
+
+# Comando /help (migliorato)
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    help_text = (
+        "🆘 <b>Aiuto e istruzioni</b>\n\n"
+        "Benvenuto nel <b>BlackJack Assistant Bot</b>! Ecco come utilizzarmi al meglio:\n\n"
+        "🎲 <b>/start</b> - Avvia il bot e scegli la modalità desiderata\n"
+        "🏠 <b>/home</b> - Torna rapidamente al menu principale\n"
+        "🃏 <b>/suggerimento</b> - Accedi ai suggerimenti strategici di gioco\n"
+        "🧮 <b>/conteggio</b> - Attiva la modalità conteggio carte (Sistema Wong Halves)\n"
+        "🔄 <b>/reset</b> - Resetta tutte le impostazioni della partita corrente\n\n"
+        "<i>In ogni momento puoi usare questi comandi per navigare velocemente tra le varie sezioni. Buon divertimento! 🎉</i>"
+    )
+    await update.message.reply_html(help_text)
