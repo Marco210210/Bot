@@ -246,3 +246,21 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         reset_counting_state(context)
         await start(update, context)
         return
+
+# Comando /help
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    help_text = (
+        "🆘 <b>Aiuto e istruzioni</b>\n\n"
+        "🎲 <b>/start</b> - Avvia il bot e scegli una modalità\n"
+        "🃏 <b>/player_cards</b> - Inserisci manualmente le tue carte\n"
+        "🔄 <b>/reset</b> - Resetta la partita corrente\n\n"
+        "<i>Segui le istruzioni sullo schermo per giocare e usare i suggerimenti!</i>"
+    )
+    await update.message.reply_html(help_text)
+
+# Comando /reset
+async def reset_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data.clear()
+    context.user_data["player_hand"] = []
+    context.user_data["dealer_card"] = None
+    await update.message.reply_text("🔄 Partita resettata! Puoi iniziare una nuova partita con /start.")
