@@ -1,9 +1,8 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 from game_logic import suggest_move, hand_value
-from keyboards import get_player_cards_keyboard, get_new_card_keyboard, send_dealer_card_selection, get_player_count_keyboard
-from card_count import reset_counting_state, get_true_count
-from betting_deviation import get_betting_unit, get_betting_deviation_message
+from keyboards import get_player_cards_keyboard, get_new_card_keyboard, send_dealer_card_selection, get_player_count_keyboard, get_deck_count_keyboard
+from card_count import reset_counting_state
 from card_count_handlers import (
     start_card_counting,
     handle_player_count_selection,
@@ -288,60 +287,3 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "<i>In ogni momento puoi usare questi comandi per navigare velocemente tra le varie sezioni. Buon divertimento! 🎉</i>"
     )
     await update.message.reply_html(help_text)
-
-async def ask_betting_params(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Chiedi le informazioni di base per calcolare la Betting Deviation."""
-    # Chiedi il budget iniziale (bankroll)
-    await update.message.reply_text("💰 Qual è il tuo budget iniziale (Bankroll)?")
-    return "asking_budget"  # Indica che siamo nella fase di domanda del budget
-
-async def handle_betting_params(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    try:
-        context.user_data["bankroll"] = int(update.message.text)
-    except ValueError:
-        await update.message.reply_text("❌ Per favore, inserisci un numero intero valido per il tuo bankroll.")
-        return "asking_budget"
-    
-    # Chiedi la puntata minima
-    await update.message.reply_text("💵 Qual è la puntata minima sul tavolo?")
-    return "asking_min_bet"
-
-async def handle_min_bet(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    try:
-        context.user_data["min_bet"] = int(update.message.text)
-    except ValueError:
-        await update.message.reply_text("❌ Per favore, inserisci un numero intero valido per la puntata minima.")
-        return "asking_min_bet"
-    
-    # Chiedi l'incremento della puntata
-    await update.message.reply_text("📈 Qual è l'incremento della puntata?")
-    return "asking_bet_increment"
-
-async def handle_bet_increment(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    try:
-        context.user_data["bet_increment"] = int(update.message.text)
-    except ValueError:
-        await update.message.reply_text("❌ Per favore, inserisci un numero intero valido per l'incremento della puntata.")
-        return "asking_bet_increment"
-    
-    # Chiedi la propensione al rischio
-    await update.message.reply_text("⚖️ Che tipo di propensione al rischio hai? (Bassa, Media, Alta)")
-    return "asking_risk_level"
-
-async def handle_risk_level(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Gestisci la risposta della propensione al rischio."""
-    context.user_data["risk_level"] = update.message.text.lower()
-    
-    # Calcola la Betting Unit basata sul bankroll e sulla propensione al rischio
-    bankroll = context.user_data["bankroll"]
-    risk_level = context.user_data["risk_level"]
-    
-    betting_unit = get_betting_unit(bankroll, risk_level)
-
-    context.user_data["betting_unit"] = betting_unit
-    
-    # Mostra il messaggio di suggerimento per la puntata
-    true_count = get_true_count(context)  # Prendi il true count
-    betting_message = get_betting_deviation_message(true_count, betting_unit, context.user_data["min_bet"], 1000)
-    await update.message.reply_text(betting_message)
-    return "betting_calculated"
