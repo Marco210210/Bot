@@ -11,21 +11,22 @@ app = Flask(__name__)
 # Funzione di start per il bot
 def start_bot():
     # Avvia il bot normalmente
-    app = Application.builder().token(TOKEN).build()
+    application = Application.builder().token(TOKEN).build()
 
     # Aggiungi i comandi
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("home", home_command))
-    app.add_handler(CommandHandler("help", help_command))
-    app.add_handler(CommandHandler("reset", reset_command))
-    app.add_handler(CommandHandler("suggerimento", suggerimento_command))
-    app.add_handler(CommandHandler("conteggio", conteggio_command))
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("home", home_command))
+    application.add_handler(CommandHandler("help", help_command))
+    application.add_handler(CommandHandler("reset", reset_command))
+    application.add_handler(CommandHandler("suggerimento", suggerimento_command))
+    application.add_handler(CommandHandler("conteggio", conteggio_command))
 
     # Aggiungi i CallbackQueryHandler
-    app.add_handler(CallbackQueryHandler(button))
+    application.add_handler(CallbackQueryHandler(button))
 
     print("🚀 Bot avviato!")
-    app.run_polling(close_loop=False)
+    # Avvia il bot in modalità polling
+    application.run_polling()
 
 # Definisci il tuo endpoint Flask
 @app.route('/')
@@ -33,11 +34,12 @@ def home():
     return 'Il bot è attivo e funzionante!'
 
 if __name__ == "__main__":
+    # Esegui Flask nella thread principale
     from threading import Thread
 
-    # Esegui il bot in un thread separato
-    bot_thread = Thread(target=start_bot)
-    bot_thread.start()
+    # Esegui il server Flask in un thread separato
+    flask_thread = Thread(target=app.run, kwargs={'host': '0.0.0.0', 'port': 8080})
+    flask_thread.start()
 
-    # Esegui Flask nella thread principale
-    app.run(host="0.0.0.0", port=8080)
+    # Esegui il bot nel thread principale
+    start_bot()
