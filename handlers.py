@@ -14,6 +14,8 @@ from card_count_handlers import (
     show_card_keyboard
 )
 
+from betting_deviation_handlers import ask_bankroll, handle_bankroll, ask_min_bet, handle_min_bet, ask_bet_increase, handle_bet_increase, ask_risk_level, handle_risk_level
+
 def get_end_options_keyboard():
     return InlineKeyboardMarkup([
         [InlineKeyboardButton("🔄 Nuova mano", callback_data="new_hand")],
@@ -287,3 +289,8 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "<i>In ogni momento puoi usare questi comandi per navigare velocemente tra le varie sezioni. Buon divertimento! 🎉</i>"
     )
     await update.message.reply_html(help_text)
+
+# Funzione per gestire la risposta del comando /entrambi
+async def both(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Iniziamo chiedendo il bankroll
+    await ask_bankroll(update, context)
