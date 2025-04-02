@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 # Funzione di start per il bot
 def start_bot():
-    # Avvia il bot normalmente
+    # Avvia il bot normalmente nel thread principale
     application = Application.builder().token(TOKEN).build()
 
     # Aggiungi i comandi
@@ -25,7 +25,7 @@ def start_bot():
     application.add_handler(CallbackQueryHandler(button))
 
     print("🚀 Bot avviato!")
-    # Avvia il bot in modalità polling
+    # Avvia il bot in modalità polling nel thread principale
     application.run_polling()
 
 # Definisci il tuo endpoint Flask
@@ -34,10 +34,10 @@ def home():
     return 'Il bot è attivo e funzionante!'
 
 if __name__ == "__main__":
-    # Esegui Flask nella thread principale
+    # Esegui il server Flask in un thread separato
     from threading import Thread
 
-    # Esegui il server Flask in un thread separato
+    # Esegui Flask nella thread principale (non separata)
     flask_thread = Thread(target=app.run, kwargs={'host': '0.0.0.0', 'port': 8080})
     flask_thread.start()
 
