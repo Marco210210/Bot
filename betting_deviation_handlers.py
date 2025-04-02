@@ -2,7 +2,6 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
 # Funzione per chiedere il budget iniziale (Bankroll)
-# Funzione per chiedere il budget iniziale (Bankroll)
 async def ask_bankroll(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Verifica se l'update è una callback query o un messaggio
     if update.message:
@@ -12,8 +11,7 @@ async def ask_bankroll(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # La fase successiva (min_bet) è gestita da handle_bankroll
 
-
-# Funzione per gestire la risposta del budget iniziale
+# Funzione per gestire la risposta del budget iniziale (Bankroll)
 async def handle_bankroll(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         bankroll = int(update.message.text)
@@ -24,9 +22,10 @@ async def handle_bankroll(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Passiamo alla fase successiva (puntata minima)
         context.user_data['phase'] = 'min_bet'
-        await ask_min_bet(update, context)
+        await ask_min_bet(update, context)  # Chiedi la puntata minima
     except ValueError:
         await update.message.reply_text("Per favore, inserisci un numero intero valido per il budget.")
+
 
 # Funzione per chiedere la puntata minima
 async def ask_min_bet(update: Update, context: ContextTypes.DEFAULT_TYPE):
