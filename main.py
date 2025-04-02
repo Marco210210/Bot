@@ -1,6 +1,7 @@
 import sys
 from flask import Flask
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler
+from telegram.ext import Updater
 import asyncio
 from config import TOKEN
 from handlers import start, button, home_command, help_command, reset_command, suggerimento_command, conteggio_command
@@ -37,8 +38,9 @@ if __name__ == "__main__":
     # Esegui il server Flask in un thread separato
     from threading import Thread
 
-    # Esegui Flask nella thread principale (non separata)
+    # Esegui Flask nella thread separata
     flask_thread = Thread(target=app.run, kwargs={'host': '0.0.0.0', 'port': 8080})
+    flask_thread.daemon = True  # Imposta il thread di Flask come daemon per terminare con il programma principale
     flask_thread.start()
 
     # Esegui il bot nel thread principale
