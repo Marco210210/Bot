@@ -94,6 +94,10 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if query.data == "count_cards":
         await start_card_counting(update, context)
         return
+    
+    if query.data == "both":
+        await both(update, context)
+        return
 
     if query.data in ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10"]:
         player_hand.append(query.data)
@@ -290,7 +294,11 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     await update.message.reply_html(help_text)
 
-# Funzione per gestire la risposta del comando /entrambi
+# Funzione per gestire il comando Entrambe
 async def both(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Iniziamo chiedendo il bankroll
+    # Iniziamo prima con il bankroll
     await ask_bankroll(update, context)
+    # Poi avvia il conteggio delle carte
+    await start_card_counting(update, context)
+    # Poi chiedi il suggerimento di gioco
+    await suggerimento_command(update, context)
