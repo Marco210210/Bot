@@ -9,7 +9,6 @@ async def ask_bankroll(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif update.callback_query:
         await update.callback_query.message.reply_text("💰 Inserisci il tuo budget iniziale (Bankroll) in euro (solo numeri interi):")
 
-
 # Funzione per gestire la risposta del budget iniziale
 async def handle_bankroll(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
