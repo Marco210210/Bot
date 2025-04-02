@@ -1,4 +1,3 @@
-import signal
 import sys
 from flask import Flask
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler
@@ -11,11 +10,7 @@ app = Flask(__name__)
 
 # Funzione di start per il bot
 def start_bot():
-    # Crea un nuovo evento loop per il thread
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-
-    # Avvia il bot con il nuovo evento loop
+    # Avvia il bot normalmente
     app = Application.builder().token(TOKEN).build()
 
     # Aggiungi i comandi
