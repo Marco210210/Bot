@@ -294,6 +294,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     await update.message.reply_html(help_text)
 
+# Funzione per gestire il comando Entrambe
 async def both(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Avvia la fase di betting deviation (sequenziale)
     context.user_data["phase"] = "betting"
@@ -301,3 +302,17 @@ async def both(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Iniziamo con il bankroll
     await ask_bankroll(update, context)
 
+# Funzione per gestire la risposta del bankroll
+async def handle_bankroll(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    try:
+        bankroll = int(update.message.text)
+        if bankroll <= 0:
+            await update.message.reply_text("Il budget deve essere un numero positivo. Riprova.")
+            return
+        context.user_data["bankroll"] = bankroll
+
+        # Passiamo alla fase successiva (puntata minima)
+        context.user_data['phase'] = 'min_bet'
+        await ask_min_bet(update, context)  # Chiedi la puntata minima
+    except ValueError:
+        await update.message.reply_text("Per favore, inserisci un numero intero valido per il budget.")
