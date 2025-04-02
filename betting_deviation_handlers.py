@@ -8,6 +8,9 @@ async def ask_bankroll(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("💰 Inserisci il tuo budget iniziale (Bankroll) in euro (solo numeri interi):")
     elif update.callback_query:
         await update.callback_query.message.reply_text("💰 Inserisci il tuo budget iniziale (Bankroll) in euro (solo numeri interi):")
+    
+    # Passiamo alla fase successiva quando il valore viene inserito
+    context.user_data['phase'] = 'min_bet'
 
 # Funzione per gestire la risposta del budget iniziale
 async def handle_bankroll(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -17,6 +20,9 @@ async def handle_bankroll(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("Il budget deve essere un numero positivo. Riprova.")
             return
         context.user_data["bankroll"] = bankroll
+
+        # Passiamo alla fase successiva (puntata minima)
+        context.user_data['phase'] = 'min_bet'
         await ask_min_bet(update, context)
     except ValueError:
         await update.message.reply_text("Per favore, inserisci un numero intero valido per il budget.")
@@ -33,6 +39,9 @@ async def handle_min_bet(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("La puntata minima deve essere un numero positivo. Riprova.")
             return
         context.user_data["min_bet"] = min_bet
+
+        # Passiamo alla fase successiva (incremento puntata)
+        context.user_data['phase'] = 'bet_increase'
         await ask_bet_increase(update, context)
     except ValueError:
         await update.message.reply_text("Per favore, inserisci un numero intero valido per la puntata minima.")
@@ -71,5 +80,7 @@ async def handle_risk_level(update: Update, context: ContextTypes.DEFAULT_TYPE):
     risk_level = query.data.split("_")[1]
     context.user_data["risk_level"] = risk_level
 
-    # Una volta ricevuto il livello di rischio, si può proseguire con la fase successiva (es. numero di giocatori)
-    #await ask_players(update, context)  # Questo è solo un esempio per la continuazione
+    # Una volta ricevuto il livello di rischio, passiamo alla fase successiva
+    context.user_data['phase'] = 'counting'
+    #await ask_player_count(update, context)
+

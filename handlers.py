@@ -294,11 +294,10 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     await update.message.reply_html(help_text)
 
-# Funzione per gestire il comando Entrambe
 async def both(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Iniziamo prima con il bankroll
+    # Avvia la fase di betting deviation (sequenziale)
+    context.user_data["phase"] = "betting"
+    
+    # Iniziamo con il bankroll
     await ask_bankroll(update, context)
-    # Poi avvia il conteggio delle carte
-    await start_card_counting(update, context)
-    # Poi chiedi il suggerimento di gioco
-    await suggerimento_command(update, context)
+
